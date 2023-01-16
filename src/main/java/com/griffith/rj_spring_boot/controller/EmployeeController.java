@@ -6,11 +6,9 @@ import com.griffith.rj_spring_boot.common.R;
 import com.griffith.rj_spring_boot.entity.Employee;
 import com.griffith.rj_spring_boot.service.EmployeeService;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.util.DigestUtils;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
@@ -98,8 +96,62 @@ public class EmployeeController {
         return R.success("add success");
     }
 
+    /**
+     * 员工信息分页查询
+     * @param page 页码
+     * @param pageSize 页展示量
+     * @param name 姓名
+     * @return R
+     */
+    @GetMapping("/page")
     public R<Page> page(int page,int pageSize,String name){
         log.info("page={},pageSize={},name={}",page,pageSize,name);
-
+        Page pageInfo = new Page(page,pageSize);
+        // 构造条件构造器
+        LambdaQueryWrapper<Employee> queryWrapper = new LambdaQueryWrapper<>();
+        // 添加过滤条件
+        queryWrapper.like(StringUtils.isNotEmpty(name),Employee::getName,name);
+        // 添加排序条件
+        queryWrapper.orderByDesc(Employee::getUpdateTime);
+        // 执行查询
+        employeeService.page(pageInfo,queryWrapper);
+        return R.success(pageInfo);
     }
+
+    /**
+     * 更新信息
+     * @param request HttpServletRequest
+     * @param employee @RequestBody Employee employee
+     * @return R<String>
+     */
+    @PutMapping
+    public R<String> update(HttpServletRequest request,@RequestBody Employee employee) {
+        log.info(employee.toString());
+
+        Long empId = (Long) request.getSession().getAttribute("employee");
+        employee.setUpdateTime(LocalDateTime.now());
+        employee.setUpdateUser(empId);
+        employeeService.updateById(employee);
+
+        return R.success("update employee info success");
+    }
+
+    /**
+     * 根据id查询员工信息
+     * @param id employee.id
+     * @return R<Employee>
+     */
+    @GetMapping("/{id}")
+    public R<Employee> getById(@PathVariable long id){
+        log.info("根据id查询员工信息");
+        Employee employee = employeeService.getById(id);
+        if(employee != null){
+            return R.success(employee);
+        }
+        return R.error("没有查询到对应员工信息");
+    }
+
+
+
+
 }
