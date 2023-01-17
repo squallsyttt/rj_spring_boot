@@ -73,10 +73,10 @@ public class EmployeeController {
     }
 
     /**
-     *
-     * @param request
-     * @param employee
-     * @return
+     * 新增员工
+     * @param request HttpServletRequest
+     * @param employee @RequestBody Employee
+     * @return R<String>
      */
     @PostMapping//直接用 postMapping 后面不跟路径就说明 路径就是 employee/ 可能是rest风格的写法
     public R<String> save(HttpServletRequest request,@RequestBody Employee employee){
@@ -150,8 +150,4 @@ public class EmployeeController {
         }
         return R.error("没有查询到对应员工信息");
     }
-
-
-
-
 }
