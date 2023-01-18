@@ -1,6 +1,7 @@
 package com.griffith.rj_spring_boot.filter;
 
 import com.alibaba.fastjson.JSON;
+import com.griffith.rj_spring_boot.common.BaseContext;
 import com.griffith.rj_spring_boot.common.R;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.AntPathMatcher;
@@ -44,6 +45,10 @@ public class LoginCheckFilter implements Filter {
 
         if(request.getSession().getAttribute("employee") != null){
             log.info("用户已登陆，用户id为P:{}",request.getSession().getAttribute("employee"));
+
+            Long empId = (Long) request.getSession().getAttribute("employee");
+            BaseContext.setCurrentId(empId);
+
             filterChain.doFilter(request,response);
             return;
         }

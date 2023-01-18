@@ -83,14 +83,14 @@ public class EmployeeController {
         log.info("新增员工，员工信息：{}",employee.toString());
 
         employee.setPassword(DigestUtils.md5DigestAsHex("123456".getBytes()));
-        employee.setCreateTime(LocalDateTime.now());
-        employee.setUpdateTime(LocalDateTime.now());
 
+        // 因为做了公共字段填充 下面注释
+        /*employee.setCreateTime(LocalDateTime.now());
+        employee.setUpdateTime(LocalDateTime.now());
         // 获取当前登陆用户id
         Long empId = (Long) request.getSession().getAttribute("employee");
-
         employee.setCreateUser(empId);
-        employee.setUpdateUser(empId);
+        employee.setUpdateUser(empId);*/
 
         employeeService.save(employee);
         return R.success("add success");
