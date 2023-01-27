@@ -3,6 +3,7 @@ package com.griffith.rj_spring_boot.controller;
 import com.griffith.rj_spring_boot.common.R;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -37,7 +38,7 @@ public class CommonController {
 
         // 类型断言 这边是ide要求补充的
         assert originalFilename != null;
-        String suffix = originalFilename.substring(originalFilename.lastIndexOf(","));
+        String suffix = originalFilename.substring(originalFilename.lastIndexOf("."));
         String fileName = UUID.randomUUID().toString() + suffix;
 
         File dir = new File(basePath);
@@ -60,6 +61,7 @@ public class CommonController {
      * @param name String
      * @param response HttpServletResponse
      */
+    @GetMapping("/download")
     public void download(String name, HttpServletResponse response) {
         try (
                 //输入流 通过输入流获取文件内容

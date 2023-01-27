@@ -6,14 +6,15 @@ import com.griffith.rj_spring_boot.common.R;
 import com.griffith.rj_spring_boot.entity.Category;
 import com.griffith.rj_spring_boot.service.CategoryService;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+
+import javax.annotation.Resource;
 
 @Slf4j
 @RestController
 @RequestMapping("/category")
 public class CategoryController {
-    @Autowired
+    @Resource
     private CategoryService categoryService;
 
     /**

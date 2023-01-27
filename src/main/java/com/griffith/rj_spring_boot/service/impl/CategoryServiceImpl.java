@@ -11,16 +11,17 @@ import com.griffith.rj_spring_boot.service.CategoryService;
 import com.griffith.rj_spring_boot.service.DishService;
 import com.griffith.rj_spring_boot.service.SetmealService;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import javax.annotation.Resource;
 
 @Service
 @Slf4j
 public class CategoryServiceImpl extends ServiceImpl<CategoryMapper, Category> implements CategoryService {
-    @Autowired
+    @Resource
     private DishService dishService;
 
-    @Autowired
+    @Resource
     private SetmealService setmealService;
 
     @Override
