@@ -34,7 +34,7 @@ public class DishServiceImpl extends ServiceImpl<DishMapper, Dish> implements Di
         Long dishId = dishDto.getId();
         List<DishFlavor> flavors = dishDto.getFlavors();
 
-        //idea 居然要我把map 换成peek 妈的也算合理 map用来做stream流方法 看起来就是歧义得一比
+        //idea 居然要我把map 换成peek 妈的也算合理 map关键字用来做stream流的api方法 歧义大而且感觉乱 git也有类似的改动
         flavors = flavors.stream().map((item) -> {
             item.setDishId(dishId);
             return item;
@@ -48,12 +48,12 @@ public class DishServiceImpl extends ServiceImpl<DishMapper, Dish> implements Di
      * @param id Long
      * @return DishDto
      */
-    @Override
+    @Transactional
     public DishDto getByIdWithFlavor(Long id) {
         Dish dish = this.getById(id);
 
         DishDto dishDto = new DishDto();
-        //这边不懂 需要过一遍视频
+        //复制属性
         BeanUtils.copyProperties(dish,dishDto);
 
         LambdaQueryWrapper<DishFlavor> queryWrapper = new LambdaQueryWrapper<>();
@@ -65,10 +65,26 @@ public class DishServiceImpl extends ServiceImpl<DishMapper, Dish> implements Di
     }
 
     /**
+     * update remove 1st && add 2sec
      * @param dishDto DishDto
      */
-    @Override
+    @Transactional
     public void updateWithFlavor(DishDto dishDto) {
+        // 更新dish表基本信息
+        this.updateById(dishDto);
+        // 清理当前对应的 dishFlavor信息
+        LambdaQueryWrapper<DishFlavor> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(DishFlavor::getDishId,dishDto.getId());
+        dishFlavorService.remove(queryWrapper);
 
+        // dish_flavor表的Insert操作
+        List<DishFlavor> flavors = dishDto.getFlavors();
+
+        flavors = flavors.stream().map((item) -> {
+            item.setDishId(dishDto.getId());
+            return item;
+        }).collect(Collectors.toList());
+
+        dishFlavorService.saveBatch(flavors);
     }
 }

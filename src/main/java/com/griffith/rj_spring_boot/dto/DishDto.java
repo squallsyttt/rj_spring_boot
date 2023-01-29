@@ -12,7 +12,7 @@ import java.util.List;
 @Data
 public class DishDto extends Dish {
 
-    // 后续分表用
+    // 分页查询时 这个categoryName 是从 分类id查询分类name得出的内容
     private String categoryName;
     private Integer copies;
 
