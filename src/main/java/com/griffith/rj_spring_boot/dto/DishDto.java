@@ -16,6 +16,6 @@ public class DishDto extends Dish {
     private String categoryName;
     private Integer copies;
 
-    //dto 封装前端和dish结构不符合的json格式数据
+    //dto 封装前端和dish结构不符合的json格式数据  但这边这个 new ArrayList 其实不太了解
     private List<DishFlavor> flavors = new ArrayList<>();
 }
