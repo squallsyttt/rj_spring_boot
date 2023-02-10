@@ -36,6 +36,10 @@ public class LoginCheckFilter implements Filter {
                 "/setmeal/**",
                 "/user/login",
                 "/user/sendMessage",
+                "/doc.html",
+                "/webjars/**",
+                "/swagger-resources",
+                "/v2/api-docs",
         };
 
         boolean check = check(urls,requestURI);
