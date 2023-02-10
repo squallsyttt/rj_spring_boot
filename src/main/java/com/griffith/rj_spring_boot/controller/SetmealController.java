@@ -11,6 +11,8 @@ import com.griffith.rj_spring_boot.service.SetmealService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.BeanUtils;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
@@ -29,6 +31,7 @@ public class SetmealController {
     private CategoryService categoryService;
 
     @PostMapping
+    @CacheEvict(value = "setmealCache",allEntries = true)
     public R<String> save(@RequestBody SetmealDto setmealDto) {
         log.info("setmealInfo: {}", setmealDto);
         setmealService.saveWithDish(setmealDto);
@@ -67,7 +70,13 @@ public class SetmealController {
         return R.success(dtoPage);
     }
 
+    /**
+     * allEntries 是删除setmeal cache下 所有的内容
+     * @param ids List<long>
+     * @return
+     */
     @DeleteMapping
+    @CacheEvict(value = "setmealCache",allEntries = true)
     public R<String> delete(@RequestParam List<Long> ids) {
         log.info("ids:{}", ids);
         setmealService.removeWithDish(ids);
@@ -75,6 +84,7 @@ public class SetmealController {
     }
 
     @GetMapping("/list")
+    @Cacheable(value = "setmealCache",key = "#setmeal.categoryId+'_'+#setmeal.status")
     public R<List<Setmeal>> list(Setmeal setmeal) {
         log.info("setmeal:{}", setmeal);
         LambdaQueryWrapper<Setmeal> queryWrapper = new LambdaQueryWrapper<>();

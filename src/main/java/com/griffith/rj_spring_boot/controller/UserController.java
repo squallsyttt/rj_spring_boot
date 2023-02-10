@@ -8,6 +8,7 @@ import com.griffith.rj_spring_boot.utils.SMSUtils;
 import com.griffith.rj_spring_boot.utils.ValidateCodeUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpSession;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 @RestController
 @RequestMapping("/user")
@@ -23,6 +25,9 @@ import java.util.Map;
 public class UserController {
     @Resource
     private UserService userService;
+
+    @Resource
+    private RedisTemplate redisTemplate;
 
     /**
      * 用来存放信息验证码
@@ -41,7 +46,10 @@ public class UserController {
 
             // Ali SMS
             // SMSUtils.sendMessage("rj_spring_boot","templateCode",phone,code);
-            session.setAttribute(phone,code);
+            // session.setAttribute(phone,code);
+            // 设置验证码存到redis中 国琦时间五分钟
+            redisTemplate.opsForValue().set(phone,code,5, TimeUnit.MINUTES);
+
             return R.success("send success");
         }
         return R.error("send fail");
@@ -53,7 +61,8 @@ public class UserController {
         String phone = map.get("phone").toString();
         String code = map.get("code").toString();
 
-        Object codeInSession = session.getAttribute(phone);
+        // Object codeInSession = session.getAttribute(phone);
+        Object codeInSession = redisTemplate.opsForValue().get(phone);
 
         if(codeInSession !=null && codeInSession.equals(code)){
             LambdaQueryWrapper<User> queryWrapper = new LambdaQueryWrapper<>();
@@ -66,6 +75,9 @@ public class UserController {
                 userService.save(user);
             }
             session.setAttribute("user",user.getId());
+
+            // 如果成功 删除redis的key
+            redisTemplate.delete(phone);
             return R.success(user);
         }
         return R.error("login fail");
